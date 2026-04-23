@@ -27,7 +27,7 @@
 
 /* enums */
 enum { SchemeNorm, SchemeSel, SchemeNormHighlight, SchemeSelHighlight,
-       SchemeOut, SchemeCaret, SchemeCursor, SchemeLast }; /* color schemes */
+       SchemeOut, SchemeCaret, SchemeCursor, SchemePrompt, SchemeLast }; /* color schemes */
 
 
 struct item {
@@ -214,27 +214,33 @@ drawmenu(void)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	drw_rect(drw, 0, 0, mw, mh, 1, 1);
 
-	if (prompt && *prompt) {
-		drw_setscheme(drw, scheme[SchemeSel]);
-		x = drw_text(drw, x, 0, promptw, bh, lrpad / 2, prompt, 0);
-	}
-	/* draw input field */
 	w = (lines > 0 || !matches) ? mw - x : inputw;
-	drw_setscheme(drw, scheme[SchemeNorm]);
-	drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
 
 	curpos = TEXTW(text) - TEXTW(&text[cursor]);
 	curpos += lrpad / 2 - 1;
-	if (using_vi_mode && text[0] != '\0') {
+
+	if (text[0] == '\0' && prompt && *prompt) {
+		drw_setscheme(drw, scheme[SchemePrompt]);
+		/* If vertical list: use full width (w), else just promptw */
+		drw_text(drw, x, 0, (lines > 0 ? w : promptw), bh, lrpad / 2, prompt, 0);
+	} else if (using_vi_mode && text[0] != '\0') {
 		drw_setscheme(drw, scheme[SchemeCursor]);
 		char vi_char[] = {text[cursor], '\0'};
-		drw_text(drw, x + curpos, 0, TEXTW(vi_char) - lrpad, bh, 0, vi_char, 0);
+		drw_text(drw, x, 0, TEXTW(vi_char) - lrpad, bh, 0, vi_char, 0);
 	} else if (using_vi_mode) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		drw_rect(drw, x + curpos, 2, lrpad / 2, bh - 4, 1, 0);
+		drw_rect(drw, x, 2, lrpad / 2, bh - 4, 1, 0);
 	} else if (curpos < w) {
 		drw_setscheme(drw, scheme[SchemeCaret]);
-		drw_rect(drw, x + curpos, 2, 2, bh - 4, 1, 0);
+		drw_rect(drw, x, 2, 2, bh - 4, 1, 0);
+	}
+
+	if (text[0] != '\0') {
+		curpos = TEXTW(text) - TEXTW(&text[cursor]);
+		if ((curpos += lrpad / 2 - 1) < w) {
+			drw_setscheme(drw, scheme[SchemeNorm]);
+			drw_rect(drw, x + curpos, 1, 2, bh - 4, 1, 0);
+		}
 	}
 
 	if (lines > 0) {

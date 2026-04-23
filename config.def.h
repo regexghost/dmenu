@@ -22,6 +22,7 @@ static const char *colors[SchemeLast][2] = {
 	[SchemeOut] = { "#000000", "#00ffff" },
 	[SchemeCaret] = { "#eeeeee", "#222222" },
 	[SchemeCursor] = { "#222222", "#bbbbbb"},
+	[SchemePrompt] = { "#444444", "#222222" },
 };
 /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
 static unsigned int lines      = 0;
