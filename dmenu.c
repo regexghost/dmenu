@@ -1151,6 +1151,10 @@ main(int argc, char *argv[])
 			colors[SchemeOut][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-of"))  /* outline foreground color */
 			colors[SchemeOut][ColFg] = argv[++i];
+		else if (!strcmp(argv[i], "-pb"))  /* prompt background color */
+			colors[SchemePrompt][ColBg] = argv[++i];
+		else if (!strcmp(argv[i], "-pf"))  /* prompt foreground color */
+			colors[SchemePrompt][ColFg] = argv[++i];
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
 		else if (!strcmp(argv[i], "-bw"))
