@@ -27,7 +27,7 @@
 
 /* enums */
 enum { SchemeNorm, SchemeSel, SchemeNormHighlight, SchemeSelHighlight,
-       SchemeOut, SchemeCaret, SchemeCursor, SchemePrompt, SchemeLast }; /* color schemes */
+       SchemeOut, SchemeCaret, SchemeCursor, SchemePrompt, SchemeBorder, SchemeLast }; /* color schemes */
 
 
 struct item {
@@ -1071,7 +1071,7 @@ setup(void)
 	                    CopyFromParent, CopyFromParent, CopyFromParent,
 	                    CWOverrideRedirect | CWBackPixel | CWEventMask, &swa);
 	if (border_width)
-		XSetWindowBorder(dpy, win, scheme[SchemeSel][ColBg].pixel);
+		XSetWindowBorder(dpy, win, scheme[SchemeBorder][ColBg].pixel);
 	XSetClassHint(dpy, win, &ch);
 
 	/* input methods */
@@ -1170,6 +1170,8 @@ main(int argc, char *argv[])
 			colors[SchemePrompt][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-pf"))  /* prompt foreground color */
 			colors[SchemePrompt][ColFg] = argv[++i];
+		else if (!strcmp(argv[i], "-bb"))  /* border color */
+			colors[SchemeBorder][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
 			embed = argv[++i];
 		else if (!strcmp(argv[i], "-bw"))

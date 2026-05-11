@@ -23,6 +23,7 @@ static const char *colors[SchemeLast][2] = {
 	[SchemeCaret] = { "#eeeeee", "#222222" },
 	[SchemeCursor] = { "#222222", "#bbbbbb"},
 	[SchemePrompt] = { "#444444", "#222222" },
+	[SchemeBorder] = { "#444444", "#222222" },
 };
 /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
 static unsigned int lines      = 0;
@@ -46,4 +47,4 @@ static Key quit_keys[] = {
 };
 
 /* Size of the window border */
-static unsigned int border_width = 0;
+static unsigned int border_width = 2;
