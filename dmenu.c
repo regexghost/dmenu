@@ -65,6 +65,8 @@ static XIC xic;
 static Drw *drw;
 static Clr *scheme[SchemeLast];
 
+static int printAnyway = False;
+
 #include "config.h"
 
 static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
@@ -652,6 +654,26 @@ draw:
 	drawmenu();
 }
 
+static void pressedEnter(XKeyEvent *ev, int retsig, int forceExit) {
+	if (print_index) {
+		printf("%d\n", sel->index);
+	} else {
+		if (sel) {
+			puts(sel->text);
+		} else if (printAnyway) {
+			puts(text);
+		}
+	}
+		//puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+
+	if (forceExit || !(ev->state & ControlMask)) {
+		cleanup();
+		exit(retsig);
+	}
+	if (sel)
+		sel->out = 1;
+}
+
 static void
 keypress(XKeyEvent *ev)
 {
@@ -685,7 +707,9 @@ keypress(XKeyEvent *ev)
 
 	if (ev->state & ControlMask) {
 		switch(ksym) {
-		case XK_a: ksym = XK_Home;      break;
+		case XK_a:
+			pressedEnter(ev, 11, True);
+			return;
 		case XK_b: ksym = XK_Left;      break;
 		case XK_c: ksym = XK_Escape;    break;
 		case XK_d: ksym = XK_Delete;    break;
@@ -709,11 +733,13 @@ keypress(XKeyEvent *ev)
 			insert(NULL, 0 - cursor);
 			break;
 		case XK_w: /* delete word */
-			while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
+			pressedEnter(ev, 12, True);
+			return;
+			/* while (cursor > 0 && strchr(worddelimiters, text[nextrune(-1)]))
 				insert(NULL, nextrune(-1) - cursor);
 			while (cursor > 0 && !strchr(worddelimiters, text[nextrune(-1)]))
 				insert(NULL, nextrune(-1) - cursor);
-			break;
+			break; */
 		case XK_y: /* paste selection */
 		case XK_Y:
 			XConvertSelection(dpy, (ev->state & ShiftMask) ? clip : XA_PRIMARY,
@@ -833,17 +859,7 @@ insert:
 		break;
 	case XK_Return:
 	case XK_KP_Enter:
-		if (print_index)
-			printf("%d\n", (sel && !(ev->state & ShiftMask)) ? sel->index : -1);
-		else
-			puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
-
-		if (!(ev->state & ControlMask)) {
-			cleanup();
-			exit(0);
-		}
-		if (sel)
-			sel->out = 1;
+		pressedEnter(ev, 0, False);
 		break;
 	case XK_Right:
 	case XK_KP_Right:
@@ -1126,6 +1142,8 @@ main(int argc, char *argv[])
 			mon = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
 			prompt = argv[++i];
+		else if (!strcmp(argv[i], "-pa"))   /* print anyway, i.e. if no match, print inputted text */
+			printAnyway = True;
 		else if (!strcmp(argv[i], "-fn"))  /* font or font set */
 			fonts[0] = argv[++i];
 		else if (!strcmp(argv[i], "-nb"))  /* normal background color */
