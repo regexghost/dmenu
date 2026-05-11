@@ -216,9 +216,6 @@ drawmenu(void)
 
 	w = (lines > 0 || !matches) ? mw - x : inputw;
 
-	curpos = TEXTW(text) - TEXTW(&text[cursor]);
-	curpos += lrpad / 2 - 1;
-
 	if (text[0] == '\0' && prompt && *prompt) {
 		drw_setscheme(drw, scheme[SchemePrompt]);
 		/* If vertical list: use full width (w), else just promptw */
@@ -230,9 +227,9 @@ drawmenu(void)
 	} else if (using_vi_mode) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		drw_rect(drw, x, 2, lrpad / 2, bh - 4, 1, 0);
-	} else if (curpos < w) {
-		drw_setscheme(drw, scheme[SchemeCaret]);
-		drw_rect(drw, x, 2, 2, bh - 4, 1, 0);
+	} else {
+		drw_setscheme(drw, scheme[SchemeNorm]);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, text, 0);
 	}
 
 	if (text[0] != '\0') {
